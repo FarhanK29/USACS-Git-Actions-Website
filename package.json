@@ -1,0 +1,21 @@
+{
+  "name": "usacs-git-actions-website",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "",
+  "main": "script.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "test": "vitest run",
+    "preview": "vite preview"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "happy-dom": "^20.7.0",
+    "vite": "^7.3.1",
+    "vitest": "^4.0.18"
+  }
+}
