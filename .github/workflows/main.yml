@@ -1,26 +1,59 @@
-name: CI Pipeline
+name: CI/CD Workshop Pipeline
 
 on:
-    push:
-        branches: [ main ]
-    pull_request:
-        branches: [ main ]
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+#Grants permissions to host the site
+permissions:
+  contents: read
+  pages: write
+  id-token: write
 
 jobs:
-    test-and-build:
-        runs-on: ubuntu-latest
-        steps:
-        - name: Checkout Code
-          uses: actions/checkout@v4
+  
+  #CI:
+  test-and-build:
+    runs-on: ubuntu-latest # "Hiring" a clean virtual computer
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-        - name: Setup Node
-          uses: actions/setup-node@v4
-          with:
-            node-version: 20
-            cache: 'npm'
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
 
-        - name: Install Dependencies
-          run: npm install
+      - name: Install Dependencies
+        run: npm install
 
-        - name: Run Tests
-          run: npm test
+      - name: Run Tests
+        run: npm test
+
+      - name: Run Build
+        run: npm run build
+    
+      # Sends dist folder to GitHub cloud so that it can be used for deployment
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./dist
+
+  #CD:      
+  deploy:
+    needs: test-and-build
+
+    #Makes it so that it only deploys if we're on the main branch not just on PR's
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      #Takes dist folder we saved earlier and deploys it to github pages
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
